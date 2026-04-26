@@ -22,24 +22,26 @@ fun AppNavGraph(
         modifier = modifier
     ) {
         composable(Screen.ShoppingList.route) {
-            // Placeholder for Shopping List Screen
-            Text("Shopping List Screen")
+            com.sranker.shoppinglistmanager.ui.shoppinglist.ShoppingListScreen(snackbarHostState = snackbarHostState)
         }
         composable(Screen.Archive.route) {
-            // Placeholder for Archive Screen
-            Text("Archive Screen")
+            com.sranker.shoppinglistmanager.ui.archive.ArchiveScreen(onNavigateToDetail = { sessionId ->
+                navController.navigate(Screen.ArchiveDetail.createRoute(sessionId))
+            })
         }
         composable(
             route = Screen.ArchiveDetail.route,
             arguments = listOf(navArgument("sessionId") { type = NavType.LongType })
         ) { backStackEntry ->
             val sessionId = backStackEntry.arguments?.getLong("sessionId") ?: 0L
-            // Placeholder for Archive Detail
-            Text("Archive Detail Screen $sessionId")
+            com.sranker.shoppinglistmanager.ui.archive.ArchiveDetailScreen(
+                sessionId = sessionId,
+                snackbarHostState = snackbarHostState,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         composable(Screen.Settings.route) {
-            // Placeholder for Settings Screen
-            Text("Settings Screen")
+            com.sranker.shoppinglistmanager.ui.settings.SettingsScreen()
         }
     }
 }
