@@ -13,6 +13,18 @@ interface ShoppingItemDao {
     @Query("SELECT * FROM shopping_items ORDER BY sortOrder ASC")
     fun getAll(): Flow<List<ShoppingItem>>
 
+    @Query("SELECT * FROM shopping_items WHERE id = :id")
+    suspend fun getById(id: Long): ShoppingItem?
+
+    @Query("SELECT MAX(sortOrder) FROM shopping_items")
+    suspend fun getMaxSortOrder(): Int?
+
+    @Query("SELECT * FROM shopping_items WHERE isPurchased = 1")
+    suspend fun getPurchasedItems(): List<ShoppingItem>
+
+    @Query("DELETE FROM shopping_items WHERE isPurchased = 1")
+    suspend fun deletePurchasedItems()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: ShoppingItem): Long
 

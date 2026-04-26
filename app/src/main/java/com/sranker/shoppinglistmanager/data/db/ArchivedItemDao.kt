@@ -11,6 +11,9 @@ interface ArchivedItemDao {
     @Query("SELECT * FROM archived_items WHERE sessionId = :sessionId")
     fun getBySession(sessionId: Long): Flow<List<ArchivedItem>>
 
+    @Query("SELECT * FROM archived_items WHERE sessionId = :sessionId")
+    suspend fun getItemsForSession(sessionId: Long): List<ArchivedItem>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<ArchivedItem>)
 
