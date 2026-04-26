@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">Bevásárlólista Kezelő</string>
+    <string name="add_item">Hozzáadás</string>
+    <string name="quantity">Mennyiség</string>
+    <string name="undo">Visszavonás</string>
+    <string name="item_deleted">Tétel Törölve</string>
+    <string name="archive_session">Munkamenet Archiválása</string>
+    <string name="search_filter">Keresés vagy Szűrés</string>
+    <string name="no_items_yet">Még nincsenek tételek. Adj hozzá valamit!</string>
+
+    <string name="archived_sessions">Archivált Munkamenetek</string>
+    <string name="rename_session">Munkamenet Átnevezése</string>
+    <string name="restore_session">Munkamenet Visszaállítása</string>
+    <string name="no_archived_sessions">Nincsenek archivált munkamenetek.</string>
+    <string name="session_name_default">Munkamenet %s</string>
+
+    <string name="settings">Beállítások</string>
+    <string name="theme">Téma</string>
+    <string name="theme_ocean_dark">Sötét Óceán</string>
+    <string name="theme_forest_light">Világos Erdő</string>
+    <string name="theme_sunset_dark">Sötét Naplemente</string>
+    <string name="theme_snow_light">Világos Hó</string>
+
+    <string name="language">Nyelv</string>
+    <string name="language_english">Angol</string>
+    <string name="language_hungarian">Magyar</string>
+    <string name="language_german">Német</string>
+
+    <string name="text_size">Szöveg Mérete</string>
+    <string name="text_size_small">Kicsi</string>
+    <string name="text_size_medium">Közepes</string>
+    <string name="text_size_large">Nagy</string>
+
+    <string name="rename">Átnevezés</string>
+    <string name="cancel">Mégse</string>
+    <string name="save">Mentés</string>
+    <string name="enter_new_name">Írd be az új nevet</string>
+
+    <string name="cd_delete_item">Tétel törlése</string>
+    <string name="cd_toggle_item">Tétel állapotának váltása</string>
+    <string name="cd_drag_reorder">Húzás az átrendezéshez</string>
+    <string name="cd_go_back">Vissza</string>
+    <string name="cd_open_settings">Beállítások megnyitása</string>
+    <string name="cd_open_archive">Archívum megnyitása</string>
+
+    <string name="nav_list">Bevásárlólista</string>
+    <string name="nav_archive">Archívum</string>
+    <string name="nav_settings">Beállítások</string>
+</resources>

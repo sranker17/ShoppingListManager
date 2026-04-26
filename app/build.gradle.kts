@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.7")
+    implementation("androidx.appcompat:appcompat:1.6.1")
 
     // Room
     implementation(libs.room.runtime)

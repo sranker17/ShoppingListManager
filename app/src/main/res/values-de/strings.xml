@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">Einkaufslisten-Manager</string>
+    <string name="add_item">Hinzufügen</string>
+    <string name="quantity">Menge</string>
+    <string name="undo">Rückgängig</string>
+    <string name="item_deleted">Element Gelöscht</string>
+    <string name="archive_session">Sitzung Archivieren</string>
+    <string name="search_filter">Suchen oder Filtern</string>
+    <string name="no_items_yet">Noch keine Elemente. Füge etwas hinzu!</string>
+
+    <string name="archived_sessions">Archivierte Sitzungen</string>
+    <string name="rename_session">Sitzung Umbenennen</string>
+    <string name="restore_session">Sitzung Wiederherstellen</string>
+    <string name="no_archived_sessions">Keine archivierten Sitzungen.</string>
+    <string name="session_name_default">Sitzung %s</string>
+
+    <string name="settings">Einstellungen</string>
+    <string name="theme">Design</string>
+    <string name="theme_ocean_dark">Ozean Dunkel</string>
+    <string name="theme_forest_light">Wald Hell</string>
+    <string name="theme_sunset_dark">Sonnenuntergang Dunkel</string>
+    <string name="theme_snow_light">Schnee Hell</string>
+
+    <string name="language">Sprache</string>
+    <string name="language_english">Englisch</string>
+    <string name="language_hungarian">Ungarisch</string>
+    <string name="language_german">Deutsch</string>
+
+    <string name="text_size">Textgröße</string>
+    <string name="text_size_small">Klein</string>
+    <string name="text_size_medium">Mittel</string>
+    <string name="text_size_large">Groß</string>
+
+    <string name="rename">Umbenennen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="save">Speichern</string>
+    <string name="enter_new_name">Neuen Namen eingeben</string>
+
+    <string name="cd_delete_item">Element löschen</string>
+    <string name="cd_toggle_item">Element umschalten</string>
+    <string name="cd_drag_reorder">Zum Umordnen ziehen</string>
+    <string name="cd_go_back">Zurück</string>
+    <string name="cd_open_settings">Einstellungen öffnen</string>
+    <string name="cd_open_archive">Archiv öffnen</string>
+
+    <string name="nav_list">Einkaufsliste</string>
+    <string name="nav_archive">Archiv</string>
+    <string name="nav_settings">Einstellungen</string>
+</resources>
