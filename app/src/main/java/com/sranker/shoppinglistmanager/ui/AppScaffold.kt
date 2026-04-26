@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,7 +34,7 @@ fun AppScaffold() {
                 title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     Icon(
-                        imageVector = Icons.Default.ShoppingCart,
+                        painter = painterResource(id = R.drawable.ic_cart),
                         contentDescription = null
                     )
                 },
