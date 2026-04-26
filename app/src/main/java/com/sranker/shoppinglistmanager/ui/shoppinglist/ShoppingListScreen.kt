@@ -1,6 +1,8 @@
 package com.sranker.shoppinglistmanager.ui.shoppinglist
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,21 +10,38 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sranker.shoppinglistmanager.R
-import com.sranker.shoppinglistmanager.data.db.ShoppingItem
 import kotlinx.coroutines.launch
+import com.sranker.shoppinglistmanager.ui.components.EmptyState
+import com.sranker.shoppinglistmanager.ui.components.LoadingShimmerList
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+
+@Preview(widthDp = 360, name = "Small Width")
+@Composable
+fun ShoppingListSmallPreview() {
+    Surface {
+        Text("Responsiveness Check: 360dp")
+    }
+}
+
+@Preview(widthDp = 430, name = "Large Width")
+@Composable
+fun ShoppingListLargePreview() {
+    Surface {
+        Text("Responsiveness Check: 430dp")
+    }
+}
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -32,12 +51,12 @@ fun ShoppingListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()
-    
+
     val deletedMsg = stringResource(R.string.item_deleted)
     val undoMsg = stringResource(R.string.undo)
 
     LaunchedEffect(uiState.undoEvent) {
-        uiState.undoEvent?.let { item ->
+        uiState.undoEvent?.let { _ ->
             scope.launch {
                 val result = snackbarHostState.showSnackbar(
                     message = deletedMsg,
@@ -58,10 +77,14 @@ fun ShoppingListScreen(
             onAddItem = { name, qty -> viewModel.addItem(name, qty) }
         )
 
-        if (uiState.items.isEmpty()) {
-            Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.no_items_yet), style = MaterialTheme.typography.bodyLarge)
-            }
+        if (uiState.isLoading) {
+            LoadingShimmerList(modifier = Modifier.weight(1f))
+        } else if (uiState.items.isEmpty()) {
+            EmptyState(
+                icon = Icons.Default.ShoppingCart,
+                message = stringResource(R.string.no_items_yet),
+                modifier = Modifier.weight(1f)
+            )
         } else {
             val lazyListState = rememberLazyListState()
             val reorderableState = sh.calvin.reorderable.rememberReorderableLazyListState(lazyListState) { from, to ->
@@ -81,7 +104,7 @@ fun ShoppingListScreen(
                 items(uiState.items, key = { it.id }) { item ->
                     ReorderableItem(reorderableState, key = item.id) { isDragging ->
                         val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
-                        
+
                         SwipeToDismissBox(
                             state = rememberSwipeToDismissBoxState(
                                 confirmValueChange = { value ->
@@ -104,7 +127,9 @@ fun ShoppingListScreen(
                         ) {
                             Card(
                                 elevation = CardDefaults.cardElevation(defaultElevation = elevation),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .animateItemPlacement()
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -120,19 +145,26 @@ fun ShoppingListScreen(
                                             Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.cd_drag_reorder))
                                         }
                                     }
+
+                                    val scale by animateFloatAsState(
+                                        targetValue = if (item.isPurchased) 1.2f else 1f,
+                                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                                        label = "checkboxScale"
+                                    )
                                     
                                     Checkbox(
                                         checked = item.isPurchased,
-                                        onCheckedChange = { viewModel.toggleItem(item.id) }
+                                        onCheckedChange = { viewModel.toggleItem(item.id) },
+                                        modifier = Modifier.scale(scale)
                                     )
-                                    
+
                                     Text(
                                         text = item.name,
                                         modifier = Modifier.weight(1f),
                                         style = MaterialTheme.typography.bodyLarge,
                                         textDecoration = if (item.isPurchased) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
                                     )
-                                    
+
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         IconButton(onClick = { if (item.quantity > 1) viewModel.updateQuantity(item.id, item.quantity - 1) }) {
                                             Text("-", style = MaterialTheme.typography.titleLarge)
@@ -150,15 +182,19 @@ fun ShoppingListScreen(
             }
         }
 
-        val checkedItemsCount = uiState.items.count { it.isPurchased }
-        Button(
-            onClick = { viewModel.archiveSession() },
-            enabled = checkedItemsCount > 0,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+        AnimatedVisibility(
+            visible = uiState.items.any { it.isPurchased },
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
         ) {
-            Text(stringResource(R.string.archive_session))
+            Button(
+                onClick = { viewModel.archiveSession() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(stringResource(R.string.archive_session))
+            }
         }
     }
 }
@@ -166,7 +202,7 @@ fun ShoppingListScreen(
 @Composable
 fun AddItemBar(onAddItem: (String, Int) -> Unit) {
     var name by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf(1) }
+    var quantity by remember { mutableIntStateOf(1) }
 
     Row(
         modifier = Modifier

@@ -7,7 +7,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SuggestionRepository @Inject constructor(
-    private val db: ShopListDatabase
+    db: ShopListDatabase
 ) {
     private val historyDao = db.itemHistoryDao()
 

@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import com.sranker.shoppinglistmanager.ui.components.EmptyState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +19,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sranker.shoppinglistmanager.R
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.ui.tooling.preview.Preview
+
+@Preview(widthDp = 360, name = "Small Width")
+@Composable
+fun ArchiveSmallPreview() {
+    Surface {
+        Text("Archive Responsiveness: 360dp")
+    }
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -27,9 +38,10 @@ fun ArchiveScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     if (uiState.sessions.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(stringResource(R.string.no_archived_sessions), style = MaterialTheme.typography.bodyLarge)
-        }
+        EmptyState(
+            icon = Icons.AutoMirrored.Filled.List,
+            message = stringResource(R.string.no_archived_sessions)
+        )
     } else {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
@@ -53,10 +65,7 @@ fun ArchiveScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            val sessionName = session.name ?: run {
-                                val sdf = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
-                                sdf.format(Date(session.createdAt))
-                            }
+                            val sessionName = session.name
                             Text(sessionName, style = MaterialTheme.typography.titleMedium)
                         }
                         IconButton(onClick = { viewModel.openRenameDialog(session) }) {

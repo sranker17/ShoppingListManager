@@ -63,3 +63,4 @@ replay_pid*
 # Mac
 /wrapper/
 /gradlew
+/.vscode
