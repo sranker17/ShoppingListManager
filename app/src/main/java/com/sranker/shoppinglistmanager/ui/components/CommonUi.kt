@@ -33,14 +33,14 @@ fun EmptyState(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
             text = message,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
         )
     }
 }
@@ -72,19 +72,13 @@ fun ShimmerItem(
         end = Offset(x = translateAnim, y = translateAnim)
     )
 
-    Card(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .height(72.dp)
-            .clip(RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(brush)
-        )
-    }
+            .clip(RoundedCornerShape(12.dp))
+            .background(brush)
+    )
 }
 
 @Composable

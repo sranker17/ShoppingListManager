@@ -9,38 +9,86 @@ import com.sranker.shoppinglistmanager.data.repository.TextSizePreference
 
 private val OceanDarkColorScheme = darkColorScheme(
     primary = OceanTeal,
-    background = OceanNavy,
-    surface = OceanNavy,
-    onPrimary = OceanNavy,
-    onBackground = OceanWhite,
-    onSurface = OceanWhite
+    background = MinimalistBackground,
+    surface = MinimalistBackground,
+    onPrimary = MinimalistBackground,
+    onBackground = OceanText,
+    onSurface = OceanText,
+    surfaceVariant = MinimalistBackground,
+    onSurfaceVariant = OceanText,
+    surfaceContainer = MinimalistBackground
 )
 
-private val ForestLightColorScheme = lightColorScheme(
+private val ForestLightColorScheme = darkColorScheme(
     primary = ForestGreen,
-    background = ForestBeige,
-    surface = ForestBeige,
-    onPrimary = ForestBrown,
-    onBackground = ForestBrown,
-    onSurface = ForestBrown
+    background = MinimalistBackground,
+    surface = MinimalistBackground,
+    onPrimary = MinimalistBackground,
+    onBackground = ForestText,
+    onSurface = ForestText,
+    surfaceVariant = MinimalistBackground,
+    onSurfaceVariant = ForestText,
+    surfaceContainer = MinimalistBackground
 )
 
 private val SunsetDarkColorScheme = darkColorScheme(
-    primary = SunsetCoral,
-    background = SunsetCharcoal,
-    surface = SunsetCharcoal,
-    onPrimary = SunsetCharcoal,
-    onBackground = SunsetCream,
-    onSurface = SunsetCream
+    primary = SunsetPink,
+    background = MinimalistBackground,
+    surface = MinimalistBackground,
+    onPrimary = MinimalistBackground,
+    onBackground = SunsetText,
+    onSurface = SunsetText,
+    surfaceVariant = MinimalistBackground,
+    onSurfaceVariant = SunsetText,
+    surfaceContainer = MinimalistBackground
 )
 
-private val SnowLightColorScheme = lightColorScheme(
+private val SnowLightColorScheme = darkColorScheme(
     primary = SnowSlate,
-    background = SnowWhite,
-    surface = SnowWhite,
-    onPrimary = SnowWhite,
-    onBackground = SnowCharcoal,
-    onSurface = SnowCharcoal
+    background = MinimalistBackground,
+    surface = MinimalistBackground,
+    onPrimary = MinimalistBackground,
+    onBackground = SnowText,
+    onSurface = SnowText,
+    surfaceVariant = MinimalistBackground,
+    onSurfaceVariant = SnowText,
+    surfaceContainer = MinimalistBackground
+)
+
+private val SkyLightColorScheme = lightColorScheme(
+    primary = SkyPrimary,
+    background = SkyBackground,
+    surface = SkyBackground,
+    onPrimary = SkyBackground,
+    onBackground = SkyText,
+    onSurface = SkyText,
+    surfaceVariant = SkyBackground,
+    onSurfaceVariant = SkyText,
+    surfaceContainer = SkyBackground
+)
+
+private val RoseLightColorScheme = lightColorScheme(
+    primary = RosePrimary,
+    background = RoseBackground,
+    surface = RoseBackground,
+    onPrimary = RoseBackground,
+    onBackground = RoseText,
+    onSurface = RoseText,
+    surfaceVariant = RoseBackground,
+    onSurfaceVariant = RoseText,
+    surfaceContainer = RoseBackground
+)
+
+private val SandLightColorScheme = lightColorScheme(
+    primary = SandPrimary,
+    background = SandBackground,
+    surface = SandBackground,
+    onPrimary = SandBackground,
+    onBackground = SandText,
+    onSurface = SandText,
+    surfaceVariant = SandBackground,
+    onSurfaceVariant = SandText,
+    surfaceContainer = SandBackground
 )
 
 @Composable
@@ -54,6 +102,9 @@ fun AppTheme(
         ThemeEnum.FOREST_LIGHT -> ForestLightColorScheme
         ThemeEnum.SUNSET_DARK -> SunsetDarkColorScheme
         ThemeEnum.SNOW_LIGHT -> SnowLightColorScheme
+        ThemeEnum.SKY_LIGHT -> SkyLightColorScheme
+        ThemeEnum.ROSE_LIGHT -> RoseLightColorScheme
+        ThemeEnum.SAND_LIGHT -> SandLightColorScheme
     }
 
     val multiplier = when (textSize) {

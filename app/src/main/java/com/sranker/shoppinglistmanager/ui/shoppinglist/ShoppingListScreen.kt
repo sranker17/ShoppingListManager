@@ -22,8 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sranker.shoppinglistmanager.R
 import kotlinx.coroutines.launch
+import com.sranker.shoppinglistmanager.ui.components.CustomHeader
 import com.sranker.shoppinglistmanager.ui.components.EmptyState
 import com.sranker.shoppinglistmanager.ui.components.LoadingShimmerList
+import androidx.compose.ui.draw.shadow
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -50,29 +52,15 @@ fun ShoppingListScreen(
     viewModel: ShoppingListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scope = rememberCoroutineScope()
-
-    val deletedMsg = stringResource(R.string.item_deleted)
-    val undoMsg = stringResource(R.string.undo)
-
-    LaunchedEffect(uiState.undoEvent) {
-        uiState.undoEvent?.let { _ ->
-            scope.launch {
-                val result = snackbarHostState.showSnackbar(
-                    message = deletedMsg,
-                    actionLabel = undoMsg,
-                    duration = SnackbarDuration.Short
-                )
-                if (result == SnackbarResult.ActionPerformed) {
-                    viewModel.undoDelete()
-                } else {
-                    viewModel.dismissUndo()
-                }
-            }
-        }
-    }
+    UndoSnackbarHandler(
+        undoEvent = uiState.undoEvent,
+        snackbarHostState = snackbarHostState,
+        onUndo = { viewModel.undoDelete() },
+        onDismiss = { viewModel.dismissUndo() }
+    )
 
     Column(modifier = Modifier.fillMaxSize()) {
+
         AddItemBar(
             onAddItem = { name, qty -> viewModel.addItem(name, qty) }
         )
@@ -86,100 +74,11 @@ fun ShoppingListScreen(
                 modifier = Modifier.weight(1f)
             )
         } else {
-            val lazyListState = rememberLazyListState()
-            val reorderableState = sh.calvin.reorderable.rememberReorderableLazyListState(lazyListState) { from, to ->
-                val fromItem = uiState.items.getOrNull(from.index)
-                val toItem = uiState.items.getOrNull(to.index)
-                if (fromItem != null && toItem != null && !fromItem.isPurchased && !toItem.isPurchased) {
-                    viewModel.reorderItems(from.index, to.index)
-                }
-            }
-
-            LazyColumn(
-                state = lazyListState,
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(uiState.items, key = { it.id }) { item ->
-                    ReorderableItem(reorderableState, key = item.id) { isDragging ->
-                        val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
-
-                        SwipeToDismissBox(
-                            state = rememberSwipeToDismissBoxState(
-                                confirmValueChange = { value ->
-                                    if (value == SwipeToDismissBoxValue.StartToEnd || value == SwipeToDismissBoxValue.EndToStart) {
-                                        viewModel.deleteItem(item.id)
-                                        true
-                                    } else false
-                                }
-                            ),
-                            backgroundContent = {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(MaterialTheme.colorScheme.errorContainer),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer)
-                                }
-                            }
-                        ) {
-                            Card(
-                                elevation = CardDefaults.cardElevation(defaultElevation = elevation),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .animateItemPlacement()
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    if (!item.isPurchased) {
-                                        IconButton(
-                                            onClick = {},
-                                            modifier = Modifier.draggableHandle()
-                                        ) {
-                                            Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.cd_drag_reorder))
-                                        }
-                                    }
-
-                                    val scale by animateFloatAsState(
-                                        targetValue = if (item.isPurchased) 1.2f else 1f,
-                                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-                                        label = "checkboxScale"
-                                    )
-                                    
-                                    Checkbox(
-                                        checked = item.isPurchased,
-                                        onCheckedChange = { viewModel.toggleItem(item.id) },
-                                        modifier = Modifier.scale(scale)
-                                    )
-
-                                    Text(
-                                        text = item.name,
-                                        modifier = Modifier.weight(1f),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        textDecoration = if (item.isPurchased) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
-                                    )
-
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        IconButton(onClick = { if (item.quantity > 1) viewModel.updateQuantity(item.id, item.quantity - 1) }) {
-                                            Text("-", style = MaterialTheme.typography.titleLarge)
-                                        }
-                                        Text("${item.quantity}")
-                                        IconButton(onClick = { viewModel.updateQuantity(item.id, item.quantity + 1) }) {
-                                            Text("+", style = MaterialTheme.typography.titleLarge)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            ShoppingListContent(
+                items = uiState.items,
+                viewModel = viewModel,
+                modifier = Modifier.weight(1f)
+            )
         }
 
         AnimatedVisibility(
@@ -210,15 +109,19 @@ fun AddItemBar(onAddItem: (String, Int) -> Unit) {
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        OutlinedTextField(
+        TextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text(stringResource(R.string.add_item)) },
+            placeholder = { Text(stringResource(R.string.add_item)) },
             modifier = Modifier.weight(1f),
-            singleLine = true
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent
+            )
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Button(
+        Spacer(modifier = Modifier.width(16.dp))
+        OutlinedIconButton(
             onClick = {
                 if (name.isNotBlank()) {
                     onAddItem(name, quantity)
@@ -226,9 +129,163 @@ fun AddItemBar(onAddItem: (String, Int) -> Unit) {
                     quantity = 1
                 }
             },
-            enabled = name.isNotBlank()
+            enabled = name.isNotBlank(),
+            modifier = Modifier.size(48.dp)
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShoppingItemRow(
+    item: com.sranker.shoppinglistmanager.data.db.ShoppingItem,
+    elevation: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier,
+    draggableHandle: (@Composable () -> Unit)? = null,
+    onToggle: () -> Unit,
+    onDelete: () -> Unit,
+    onIncreaseQty: () -> Unit,
+    onDecreaseQty: () -> Unit
+) {
+    SwipeToDismissBox(
+        state = rememberSwipeToDismissBoxState(
+            confirmValueChange = { value ->
+                if (value == SwipeToDismissBoxValue.StartToEnd || value == SwipeToDismissBoxValue.EndToStart) {
+                    onDelete()
+                    true
+                } else false
+            }
+        ),
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.errorContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer)
+            }
+        }
+    ) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .shadow(elevation)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 8.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            draggableHandle?.invoke()
+
+            val scale by animateFloatAsState(
+                targetValue = if (item.isPurchased) 1.2f else 1f,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                label = "checkboxScale"
+            )
+            
+            Checkbox(
+                checked = item.isPurchased,
+                onCheckedChange = { onToggle() },
+                modifier = Modifier.scale(scale)
+            )
+
+            Text(
+                text = item.name,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyLarge,
+                textDecoration = if (item.isPurchased) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
+            )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onDecreaseQty) {
+                    Text("-", style = MaterialTheme.typography.titleLarge)
+                }
+                Text("${item.quantity}")
+                IconButton(onClick = onIncreaseQty) {
+                    Text("+", style = MaterialTheme.typography.titleLarge)
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ShoppingListContent(
+    items: List<com.sranker.shoppinglistmanager.data.db.ShoppingItem>,
+    viewModel: ShoppingListViewModel,
+    modifier: Modifier = Modifier
+) {
+    val lazyListState = rememberLazyListState()
+    val reorderableState = sh.calvin.reorderable.rememberReorderableLazyListState(lazyListState) { from, to ->
+        val fromItem = items.getOrNull(from.index)
+        val toItem = items.getOrNull(to.index)
+        if (fromItem != null && toItem != null && !fromItem.isPurchased && !toItem.isPurchased) {
+            viewModel.reorderItems(from.index, to.index)
+        }
+    }
+
+    LazyColumn(
+        state = lazyListState,
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(items, key = { it.id }) { item ->
+            ReorderableItem(reorderableState, key = item.id) { isDragging ->
+                val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+
+                ShoppingItemRow(
+                    item = item,
+                    elevation = elevation,
+                    modifier = Modifier.animateItemPlacement(),
+                    draggableHandle = if (!item.isPurchased) {
+                        {
+                            IconButton(
+                                onClick = {},
+                                modifier = Modifier.draggableHandle()
+                            ) {
+                                Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.cd_drag_reorder))
+                            }
+                        }
+                    } else null,
+                    onToggle = { viewModel.toggleItem(item.id) },
+                    onDelete = { viewModel.deleteItem(item.id) },
+                    onIncreaseQty = { viewModel.updateQuantity(item.id, item.quantity + 1) },
+                    onDecreaseQty = { if (item.quantity > 1) viewModel.updateQuantity(item.id, item.quantity - 1) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun UndoSnackbarHandler(
+    undoEvent: Any?,
+    snackbarHostState: SnackbarHostState,
+    onUndo: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    val deletedMsg = stringResource(R.string.item_deleted)
+    val undoMsg = stringResource(R.string.undo)
+
+    LaunchedEffect(undoEvent) {
+        undoEvent?.let { _ ->
+            scope.launch {
+                val result = snackbarHostState.showSnackbar(
+                    message = deletedMsg,
+                    actionLabel = undoMsg,
+                    duration = SnackbarDuration.Short
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    onUndo()
+                } else {
+                    onDismiss()
+                }
+            }
         }
     }
 }

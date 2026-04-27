@@ -29,22 +29,6 @@ fun AppScaffold() {
     val snackbarHostState = androidx.compose.runtime.remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                actions = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_cart),
-                        contentDescription = null
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        },
         bottomBar = {
             val items = listOf(
                 Triple(Screen.ShoppingList.route, R.string.nav_list, Icons.AutoMirrored.Filled.List),
@@ -52,12 +36,14 @@ fun AppScaffold() {
                 Triple(Screen.Settings.route, R.string.nav_settings, Icons.Default.Settings)
             )
 
-            NavigationBar {
+            NavigationBar(
+                containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.onBackground
+            ) {
                 items.forEach { (route, labelId, icon) ->
                     val selected = currentDestination?.hierarchy?.any { it.route == route } == true
                     NavigationBarItem(
                         icon = { Icon(icon, contentDescription = stringResource(labelId)) },
-                        label = { Text(stringResource(labelId)) },
                         selected = selected,
                         onClick = {
                             navController.navigate(route) {
@@ -67,7 +53,12 @@ fun AppScaffold() {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                            indicatorColor = androidx.compose.ui.graphics.Color.Transparent
+                        )
                     )
                 }
             }

@@ -1,14 +1,21 @@
 package com.sranker.shoppinglistmanager.ui.settings
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -17,6 +24,8 @@ import com.sranker.shoppinglistmanager.data.repository.AppTheme
 import com.sranker.shoppinglistmanager.data.repository.Language
 import com.sranker.shoppinglistmanager.data.repository.TextSizePreference
 import com.sranker.shoppinglistmanager.util.LocaleHelper
+import com.sranker.shoppinglistmanager.ui.components.CustomHeader
+import com.sranker.shoppinglistmanager.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,11 +38,16 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
+        CustomHeader(
+            title = stringResource(R.string.nav_settings),
+            modifier = Modifier.padding(horizontal = 0.dp)
+        )
+
         // Theme Section
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
                 text = stringResource(R.string.theme),
                 style = MaterialTheme.typography.titleMedium,
@@ -41,89 +55,112 @@ fun SettingsScreen(
             )
             Row(
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 AppTheme.entries.forEach { theme ->
-                    val nameRes = when (theme) {
-                        AppTheme.OCEAN_DARK -> R.string.theme_ocean_dark
-                        AppTheme.FOREST_LIGHT -> R.string.theme_forest_light
-                        AppTheme.SUNSET_DARK -> R.string.theme_sunset_dark
-                        AppTheme.SNOW_LIGHT -> R.string.theme_snow_light
+                    val themeColor = when (theme) {
+                        AppTheme.OCEAN_DARK -> OceanTeal
+                        AppTheme.FOREST_LIGHT -> ForestGreen
+                        AppTheme.SUNSET_DARK -> SunsetPink
+                        AppTheme.SNOW_LIGHT -> SnowSlate
+                        AppTheme.SKY_LIGHT -> SkyPrimary
+                        AppTheme.ROSE_LIGHT -> RosePrimary
+                        AppTheme.SAND_LIGHT -> SandPrimary
                     }
-                    FilterChip(
-                        selected = uiState.theme == theme,
-                        onClick = { viewModel.setTheme(theme) },
-                        label = { Text(stringResource(nameRes)) }
-                    )
+                    val isSelected = uiState.theme == theme
+
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(themeColor)
+                            .clickable { viewModel.setTheme(theme) }
+                            .border(
+                                width = if (isSelected) 3.dp else 0.dp,
+                                color = if (isSelected) MaterialTheme.colorScheme.onBackground else Color.Transparent,
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isSelected) {
+                            Box(
+                                modifier = Modifier
+                                    .size(16.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.background)
+                            )
+                        }
+                    }
                 }
             }
         }
 
         // Language Section
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
                 text = stringResource(R.string.language),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
-            SingleChoiceSegmentedButtonRow(
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Language.entries.forEachIndexed { index, lang ->
+                Language.entries.forEach { lang ->
+                    val isSelected = uiState.language == lang
                     val nameRes = when (lang) {
                         Language.ENGLISH -> R.string.language_english
                         Language.HUNGARIAN -> R.string.language_hungarian
                         Language.GERMAN -> R.string.language_german
                     }
-                    SegmentedButton(
-                        selected = uiState.language == lang,
+                    TextButton(
                         onClick = {
                             viewModel.setLanguage(lang)
                             LocaleHelper.setLocale(lang)
                         },
-                        shape = SegmentedButtonDefaults.itemShape(index = index, count = Language.entries.size)
+                        contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text(stringResource(nameRes))
+                        Text(
+                            text = stringResource(nameRes),
+                            style = if (isSelected) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge,
+                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
                     }
                 }
             }
         }
 
         // Text Size Section
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
                 text = stringResource(R.string.text_size),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
-            
-            val sliderValue = when (uiState.textSize) {
-                TextSizePreference.SMALL -> 0f
-                TextSizePreference.MEDIUM -> 1f
-                TextSizePreference.LARGE -> 2f
-            }
-            
-            Slider(
-                value = sliderValue,
-                onValueChange = { value ->
-                    val newSize = when (value.toInt()) {
-                        0 -> TextSizePreference.SMALL
-                        1 -> TextSizePreference.MEDIUM
-                        else -> TextSizePreference.LARGE
-                    }
-                    viewModel.setTextSize(newSize)
-                },
-                valueRange = 0f..2f,
-                steps = 1
-            )
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(stringResource(R.string.text_size_small), style = MaterialTheme.typography.labelMedium)
-                Text(stringResource(R.string.text_size_medium), style = MaterialTheme.typography.labelMedium)
-                Text(stringResource(R.string.text_size_large), style = MaterialTheme.typography.labelMedium)
+                TextSizePreference.entries.forEach { size ->
+                    val isSelected = uiState.textSize == size
+                    val labelRes = when (size) {
+                        TextSizePreference.SMALL -> R.string.text_size_small
+                        TextSizePreference.MEDIUM -> R.string.text_size_medium
+                        TextSizePreference.LARGE -> R.string.text_size_large
+                    }
+                    TextButton(
+                        onClick = { viewModel.setTextSize(size) },
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            text = stringResource(labelRes),
+                            style = if (isSelected) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge,
+                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
+                    }
+                }
             }
         }
     }

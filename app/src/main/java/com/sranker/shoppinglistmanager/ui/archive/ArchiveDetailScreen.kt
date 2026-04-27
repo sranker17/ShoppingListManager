@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sranker.shoppinglistmanager.R
+import com.sranker.shoppinglistmanager.ui.components.CustomHeader
 import kotlinx.coroutines.launch
 
 @Composable
@@ -30,30 +31,33 @@ fun ArchiveDetailScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        CustomHeader(
+            title = stringResource(R.string.nav_archive),
+            onBackClick = onNavigateBack
+        )
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(uiState.selectedSessionItems, key = { it.id }) { item ->
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(item.name, style = MaterialTheme.typography.bodyLarge)
-                        Text(
-                            text = "${stringResource(R.string.quantity)}: ${item.quantity}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(item.name, style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = "${stringResource(R.string.quantity)}: ${item.quantity}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }
 
-        Button(
+        OutlinedButton(
             onClick = {
                 viewModel.reloadSession(sessionId)
                 scope.launch {

@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import com.sranker.shoppinglistmanager.ui.components.CustomHeader
 import com.sranker.shoppinglistmanager.ui.components.EmptyState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,29 +38,29 @@ fun ArchiveScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    if (uiState.sessions.isEmpty()) {
-        EmptyState(
-            icon = Icons.AutoMirrored.Filled.List,
-            message = stringResource(R.string.no_archived_sessions)
-        )
-    } else {
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(uiState.sessions, key = { it.id }) { session ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .combinedClickable(
-                            onClick = { onNavigateToDetail(session.id) },
-                            onLongClick = { viewModel.openRenameDialog(session) }
-                        )
-                ) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        CustomHeader(title = stringResource(R.string.nav_archive))
+
+        if (uiState.sessions.isEmpty()) {
+            EmptyState(
+                icon = Icons.AutoMirrored.Filled.List,
+                message = stringResource(R.string.no_archived_sessions),
+                modifier = Modifier.weight(1f)
+            )
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                items(uiState.sessions, key = { it.id }) { session ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .combinedClickable(
+                                onClick = { onNavigateToDetail(session.id) },
+                                onLongClick = { viewModel.openRenameDialog(session) }
+                            )
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
@@ -102,11 +103,15 @@ fun RenameDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.rename_session)) },
         text = {
-            OutlinedTextField(
+            TextField(
                 value = text,
                 onValueChange = { text = it },
-                label = { Text(stringResource(R.string.enter_new_name)) },
-                singleLine = true
+                placeholder = { Text(stringResource(R.string.enter_new_name)) },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                    unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent
+                )
             )
         },
         confirmButton = {
