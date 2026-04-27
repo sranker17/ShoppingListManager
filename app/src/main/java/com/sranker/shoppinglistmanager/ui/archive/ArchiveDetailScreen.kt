@@ -41,24 +41,23 @@ fun ArchiveDetailScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(uiState.selectedSessionItems, key = { it.id }) { item ->
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(item.name, style = MaterialTheme.typography.bodyLarge)
-                        Text(
-                            text = "${stringResource(R.string.quantity)}: ${item.quantity}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(item.name, style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = "${stringResource(R.string.quantity)}: ${item.quantity}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }
 
-        Button(
+        OutlinedButton(
             onClick = {
                 viewModel.reloadSession(sessionId)
                 scope.launch {

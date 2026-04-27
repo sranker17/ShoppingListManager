@@ -54,28 +54,23 @@ fun ArchiveScreen(
                 modifier = Modifier.weight(1f)
             ) {
                 items(uiState.sessions, key = { it.id }) { session ->
-                    Card(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .combinedClickable(
                                 onClick = { onNavigateToDetail(session.id) },
                                 onLongClick = { viewModel.openRenameDialog(session) }
                             )
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                val sessionName = session.name
-                                Text(sessionName, style = MaterialTheme.typography.titleMedium)
-                            }
-                            IconButton(onClick = { viewModel.openRenameDialog(session) }) {
-                                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.rename_session))
-                            }
+                        Column {
+                            val sessionName = session.name
+                            Text(sessionName, style = MaterialTheme.typography.titleMedium)
+                        }
+                        IconButton(onClick = { viewModel.openRenameDialog(session) }) {
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.rename_session))
                         }
                     }
                 }
@@ -108,11 +103,15 @@ fun RenameDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.rename_session)) },
         text = {
-            OutlinedTextField(
+            TextField(
                 value = text,
                 onValueChange = { text = it },
-                label = { Text(stringResource(R.string.enter_new_name)) },
-                singleLine = true
+                placeholder = { Text(stringResource(R.string.enter_new_name)) },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                    unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent
+                )
             )
         },
         confirmButton = {
