@@ -52,12 +52,14 @@ fun AppScaffold() {
                 Triple(Screen.Settings.route, R.string.nav_settings, Icons.Default.Settings)
             )
 
-            NavigationBar {
+            NavigationBar(
+                containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.onBackground
+            ) {
                 items.forEach { (route, labelId, icon) ->
                     val selected = currentDestination?.hierarchy?.any { it.route == route } == true
                     NavigationBarItem(
                         icon = { Icon(icon, contentDescription = stringResource(labelId)) },
-                        label = { Text(stringResource(labelId)) },
                         selected = selected,
                         onClick = {
                             navController.navigate(route) {
@@ -67,7 +69,12 @@ fun AppScaffold() {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                            indicatorColor = androidx.compose.ui.graphics.Color.Transparent
+                        )
                     )
                 }
             }
