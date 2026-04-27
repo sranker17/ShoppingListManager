@@ -29,22 +29,6 @@ fun AppScaffold() {
     val snackbarHostState = androidx.compose.runtime.remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                actions = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_cart),
-                        contentDescription = null
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        },
         bottomBar = {
             val items = listOf(
                 Triple(Screen.ShoppingList.route, R.string.nav_list, Icons.AutoMirrored.Filled.List),

@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sranker.shoppinglistmanager.R
+import com.sranker.shoppinglistmanager.ui.components.CustomHeader
 import kotlinx.coroutines.launch
 
 @Composable
@@ -30,6 +31,10 @@ fun ArchiveDetailScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        CustomHeader(
+            title = stringResource(R.string.nav_archive),
+            onBackClick = onNavigateBack
+        )
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(16.dp),

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sranker.shoppinglistmanager.R
 import kotlinx.coroutines.launch
+import com.sranker.shoppinglistmanager.ui.components.CustomHeader
 import com.sranker.shoppinglistmanager.ui.components.EmptyState
 import com.sranker.shoppinglistmanager.ui.components.LoadingShimmerList
 import sh.calvin.reorderable.ReorderableItem
@@ -73,6 +74,12 @@ fun ShoppingListScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        CustomHeader(
+            title = stringResource(R.string.app_name),
+            rightIconResId = R.drawable.ic_cart,
+            onRightIconClick = { /* Optional action */ }
+        )
+
         AddItemBar(
             onAddItem = { name, qty -> viewModel.addItem(name, qty) }
         )

@@ -17,6 +17,7 @@ import com.sranker.shoppinglistmanager.data.repository.AppTheme
 import com.sranker.shoppinglistmanager.data.repository.Language
 import com.sranker.shoppinglistmanager.data.repository.TextSizePreference
 import com.sranker.shoppinglistmanager.util.LocaleHelper
+import com.sranker.shoppinglistmanager.ui.components.CustomHeader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,9 +30,14 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        CustomHeader(
+            title = stringResource(R.string.nav_settings),
+            modifier = Modifier.padding(horizontal = 0.dp)
+        )
+
         // Theme Section
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
