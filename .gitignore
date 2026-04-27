@@ -64,3 +64,5 @@ replay_pid*
 /wrapper/
 /gradlew
 /.vscode
+
+docs/example/
