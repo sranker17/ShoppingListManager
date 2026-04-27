@@ -1,79 +1,111 @@
-# Plan: Fix Language Selection Issue
+# Plan: Safe Fix for Language Not Changing
 
-The language selection is currently not working because the app lacks the necessary infrastructure for per-app language settings and the `MainActivity` does not support `AppCompatDelegate`'s locale management correctly.
+This plan fixes language switching with minimal risk by using a single source of truth for language (`SettingsRepository` / DataStore) and applying locale updates from top-level app state.
 
-## Problem Analysis
-1.  **Missing `locales_config.xml`**: Android 13+ requires this file to know which languages are supported for per-app settings.
-2.  **Missing Manifest configuration**: The `localeConfig` attribute is missing from the `<application>` tag.
-3.  **Base Activity**: `MainActivity` extends `ComponentActivity`, but `AppCompatDelegate.setApplicationLocales` works best with `AppCompatActivity`.
-4.  **No Android Theme**: `AppCompatActivity` requires an `AppCompat` theme, which is currently missing.
-5.  **Direct UI Call**: `SettingsScreen` calls `LocaleHelper.setLocale` directly, which is not ideal for state management.
+## Why the current behavior can fail
+1. **UI layer applies locale directly**: `SettingsScreen` currently calls `LocaleHelper.setLocale(...)` in click handlers, which couples UI events with app-level configuration.
+2. **No locale config for Android 13+ app language settings**: The app does not declare `locales_config.xml` and `android:localeConfig`.
+3. **Activity base and theme setup are not AppCompat-oriented**: `MainActivity` is `ComponentActivity`; locale APIs are most predictable with `AppCompatActivity`.
+4. **Risk of dual persistence**: Adding AppCompat auto-store locale service while also storing language in DataStore can create conflicting sources of truth.
 
-## Proposed Solution
-1.  **Infrastructure Setup**: Add `locales_config.xml` and update `AndroidManifest.xml`.
-2.  **Base Activity Update**: Switch to `AppCompatActivity` and add a compatible Android theme.
-3.  **Refactor Locale Management**: Move locale switching logic to the `ViewModel` and ensure it's applied correctly.
+## Safety principles
+- Keep **one source of truth** for selected language: `SettingsRepository.languageFlow`.
+- Do **not** add `AppLocalesMetadataHolderService` or AppCompat auto-store metadata.
+- Apply locale from top-level state (activity/root composition), not directly from settings UI.
+- Keep language mapping centralized in `LocaleHelper`.
 
 ---
 
-## Agent Tasks
+## Implementation Tasks
 
-### Task 1: Android Infrastructure & Resources
-**Context**: Prepare the project for per-app language support.
+### Task 1: Add Android locale infrastructure (Android 13+)
+**Goal**: Expose supported app languages to the system.
+
 **Deliverables**:
 - Create `app/src/main/res/xml/locales_config.xml`:
-    ```xml
-    <?xml version="1.0" encoding="utf-8"?>
-    <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
-        <locale android:name="en"/>
-        <locale android:name="hu"/>
-        <locale android:name="de"/>
-    </locale-config>
-    ```
-- Update `app/src/main/AndroidManifest.xml`:
-    - Add `android:localeConfig="@xml/locales_config"` to the `<application>` tag.
-    - Add the following service inside `<application>` for backward compatibility:
-        ```xml
-        <service
-            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
-            android:enabled="false"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="androidx.appcompat.app.AppLocalesMetadataHolderService" />
-            </intent-filter>
-        </service>
-        ```
-**Acceptance Criteria**:
-- `locales_config.xml` exists.
-- `AndroidManifest.xml` contains the new configuration.
+  ```xml
+  <?xml version="1.0" encoding="utf-8"?>
+  <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+      <locale android:name="en" />
+      <locale android:name="hu" />
+      <locale android:name="de" />
+  </locale-config>
+  ```
+- Update `app/src/main/AndroidManifest.xml` `<application>` with:
+  - `android:localeConfig="@xml/locales_config"`
 
-### Task 2: Activity & Theme Modernization
-**Context**: Ensure `MainActivity` supports `AppCompat` features.
+**Do not add**:
+- `androidx.appcompat.app.AppLocalesMetadataHolderService`
+- Any `autoStoreLocales` metadata
+
+**Acceptance Criteria**:
+- `locales_config.xml` exists with exactly supported locales.
+- Manifest includes `android:localeConfig`.
+
+### Task 2: Make activity/theme AppCompat-compatible
+**Goal**: Ensure stable behavior of `AppCompatDelegate.setApplicationLocales`.
+
 **Deliverables**:
 - Create `app/src/main/res/values/themes.xml`:
-    ```xml
-    <resources>
-        <style name="Theme.ShoppingListManager" parent="Theme.AppCompat.DayNight.NoActionBar" />
-    </resources>
-    ```
-- Update `app/src/main/AndroidManifest.xml` to use `android:theme="@style/Theme.ShoppingListManager"`.
-- Modify `MainActivity.kt`:
-    - Change inheritance from `ComponentActivity` to `AppCompatActivity`.
-    - Ensure imports are updated.
-**Acceptance Criteria**:
-- `MainActivity` extends `AppCompatActivity`.
-- App builds and runs with the new theme.
-
-### Task 3: Locale Management Refactoring
-**Context**: Centralize locale switching logic.
-**Deliverables**:
-- Update `ui/settings/SettingsViewModel.kt`:
-    - Call `LocaleHelper.setLocale(language)` inside `setLanguage(language)`.
-- Update `ui/settings/SettingsScreen.kt`:
-    - Remove the direct call to `LocaleHelper.setLocale(lang)` from the `onClick` handler.
+  ```xml
+  <resources>
+      <style name="Theme.ShoppingListManager" parent="Theme.AppCompat.DayNight.NoActionBar" />
+  </resources>
+  ```
+- Set application theme in `AndroidManifest.xml`:
+  - `android:theme="@style/Theme.ShoppingListManager"`
 - Update `MainActivity.kt`:
-    - In `onCreate`, observe the language from `SettingsViewModel` and ensure `LocaleHelper.setLocale` is called at least once if the current `AppCompatDelegate.getApplicationLocales()` is empty or different (to sync with DataStore on first launch).
+  - Extend `AppCompatActivity` instead of `ComponentActivity`.
+  - Keep Compose setup unchanged otherwise.
+
 **Acceptance Criteria**:
-- Selecting a language in Settings immediately updates the UI language.
-- The selected language persists across app restarts.
-- No direct `LocaleHelper` calls in the UI layer.
+- App compiles and launches.
+- `MainActivity` extends `AppCompatActivity`.
+- No theme crash at startup.
+
+### Task 3: Refactor locale application to top-level state
+**Goal**: Apply locale consistently from state, not UI clicks.
+
+**Deliverables**:
+- `ui/settings/SettingsScreen.kt`:
+  - Remove direct `LocaleHelper.setLocale(...)` call from language button click.
+  - Keep only `viewModel.setLanguage(lang)`.
+- `MainActivity.kt` (inside composition):
+  - Observe `settingsViewModel.uiState.language`.
+  - Use a guarded side effect (`LaunchedEffect(language)`) to call `LocaleHelper.setLocale(language)` only when needed.
+  - Compare current app locales (`AppCompatDelegate.getApplicationLocales()`) before setting to avoid redundant updates.
+- `ui/settings/SettingsViewModel.kt`:
+  - Keep persistence only (`repository.setLanguage(language)`).
+  - Do not call locale APIs from the ViewModel.
+
+**Acceptance Criteria**:
+- Changing language in Settings updates visible UI text.
+- Selected language persists across restart.
+- No direct locale call in UI button handlers.
+- Locale updates are state-driven from top-level composition.
+
+---
+
+## Verification Checklist
+- Run app on Android 13+:
+  - Open app language settings (system per-app language) and confirm available languages: English, Hungarian, German.
+- In-app Settings:
+  - Switch `EN -> HU -> DE` and verify key labels update.
+  - Navigate between screens after each change; language remains correct.
+- Restart app:
+  - Previously selected language is still active.
+- Regression checks:
+  - Theme switching still works.
+  - Text size switching still works.
+
+## Rollback Plan
+If regressions occur:
+1. Revert `MainActivity` locale side-effect changes.
+2. Keep manifest `localeConfig` and resource file (safe to retain).
+3. Restore prior activity base/theme only if startup/theming regressions are confirmed.
+
+## Definition of Done
+- Language change works reliably at runtime.
+- Persistence works across restart.
+- Architecture uses one locale source of truth (DataStore).
+- No AppCompat auto-store locale service is introduced.
