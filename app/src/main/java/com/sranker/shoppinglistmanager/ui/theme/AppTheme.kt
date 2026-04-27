@@ -2,45 +2,56 @@ package com.sranker.shoppinglistmanager.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import com.sranker.shoppinglistmanager.data.repository.AppTheme as ThemeEnum
 import com.sranker.shoppinglistmanager.data.repository.TextSizePreference
 
 private val OceanDarkColorScheme = darkColorScheme(
     primary = OceanTeal,
-    background = OceanNavy,
-    surface = OceanNavy,
-    onPrimary = OceanNavy,
-    onBackground = OceanWhite,
-    onSurface = OceanWhite
+    background = MinimalistBackground,
+    surface = MinimalistBackground,
+    onPrimary = MinimalistBackground,
+    onBackground = OceanText,
+    onSurface = OceanText,
+    surfaceVariant = MinimalistBackground,
+    onSurfaceVariant = OceanText,
+    surfaceContainer = MinimalistBackground
 )
 
-private val ForestLightColorScheme = lightColorScheme(
+private val ForestLightColorScheme = darkColorScheme(
     primary = ForestGreen,
-    background = ForestBeige,
-    surface = ForestBeige,
-    onPrimary = ForestBrown,
-    onBackground = ForestBrown,
-    onSurface = ForestBrown
+    background = MinimalistBackground,
+    surface = MinimalistBackground,
+    onPrimary = MinimalistBackground,
+    onBackground = ForestText,
+    onSurface = ForestText,
+    surfaceVariant = MinimalistBackground,
+    onSurfaceVariant = ForestText,
+    surfaceContainer = MinimalistBackground
 )
 
 private val SunsetDarkColorScheme = darkColorScheme(
-    primary = SunsetCoral,
-    background = SunsetCharcoal,
-    surface = SunsetCharcoal,
-    onPrimary = SunsetCharcoal,
-    onBackground = SunsetCream,
-    onSurface = SunsetCream
+    primary = SunsetPink,
+    background = MinimalistBackground,
+    surface = MinimalistBackground,
+    onPrimary = MinimalistBackground,
+    onBackground = SunsetText,
+    onSurface = SunsetText,
+    surfaceVariant = MinimalistBackground,
+    onSurfaceVariant = SunsetText,
+    surfaceContainer = MinimalistBackground
 )
 
-private val SnowLightColorScheme = lightColorScheme(
+private val SnowLightColorScheme = darkColorScheme(
     primary = SnowSlate,
-    background = SnowWhite,
-    surface = SnowWhite,
-    onPrimary = SnowWhite,
-    onBackground = SnowCharcoal,
-    onSurface = SnowCharcoal
+    background = MinimalistBackground,
+    surface = MinimalistBackground,
+    onPrimary = MinimalistBackground,
+    onBackground = SnowText,
+    onSurface = SnowText,
+    surfaceVariant = MinimalistBackground,
+    onSurfaceVariant = SnowText,
+    surfaceContainer = MinimalistBackground
 )
 
 @Composable
