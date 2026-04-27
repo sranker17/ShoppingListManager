@@ -31,7 +31,7 @@ fun SettingsScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
         CustomHeader(
             title = stringResource(R.string.nav_settings),
@@ -39,7 +39,7 @@ fun SettingsScreen(
         )
 
         // Theme Section
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
                 text = stringResource(R.string.theme),
                 style = MaterialTheme.typography.titleMedium,
@@ -47,7 +47,7 @@ fun SettingsScreen(
             )
             Row(
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 AppTheme.entries.forEach { theme ->
                     val nameRes = when (theme) {
@@ -56,80 +56,91 @@ fun SettingsScreen(
                         AppTheme.SUNSET_DARK -> R.string.theme_sunset_dark
                         AppTheme.SNOW_LIGHT -> R.string.theme_snow_light
                     }
-                    FilterChip(
-                        selected = uiState.theme == theme,
-                        onClick = { viewModel.setTheme(theme) },
-                        label = { Text(stringResource(nameRes)) }
-                    )
+                    if (uiState.theme == theme) {
+                        Button(
+                            onClick = { viewModel.setTheme(theme) },
+                            shape = androidx.compose.foundation.shape.CircleShape
+                        ) {
+                            Text(stringResource(nameRes))
+                        }
+                    } else {
+                        OutlinedButton(
+                            onClick = { viewModel.setTheme(theme) },
+                            shape = androidx.compose.foundation.shape.CircleShape
+                        ) {
+                            Text(stringResource(nameRes), color = MaterialTheme.colorScheme.onBackground)
+                        }
+                    }
                 }
             }
         }
 
         // Language Section
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
                 text = stringResource(R.string.language),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
-            SingleChoiceSegmentedButtonRow(
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Language.entries.forEachIndexed { index, lang ->
+                Language.entries.forEach { lang ->
+                    val isSelected = uiState.language == lang
                     val nameRes = when (lang) {
                         Language.ENGLISH -> R.string.language_english
                         Language.HUNGARIAN -> R.string.language_hungarian
                         Language.GERMAN -> R.string.language_german
                     }
-                    SegmentedButton(
-                        selected = uiState.language == lang,
+                    TextButton(
                         onClick = {
                             viewModel.setLanguage(lang)
                             LocaleHelper.setLocale(lang)
                         },
-                        shape = SegmentedButtonDefaults.itemShape(index = index, count = Language.entries.size)
+                        contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text(stringResource(nameRes))
+                        Text(
+                            text = stringResource(nameRes),
+                            style = if (isSelected) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge,
+                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
                     }
                 }
             }
         }
 
         // Text Size Section
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
                 text = stringResource(R.string.text_size),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
             
-            val sliderValue = when (uiState.textSize) {
-                TextSizePreference.SMALL -> 0f
-                TextSizePreference.MEDIUM -> 1f
-                TextSizePreference.LARGE -> 2f
-            }
-            
-            Slider(
-                value = sliderValue,
-                onValueChange = { value ->
-                    val newSize = when (value.toInt()) {
-                        0 -> TextSizePreference.SMALL
-                        1 -> TextSizePreference.MEDIUM
-                        else -> TextSizePreference.LARGE
-                    }
-                    viewModel.setTextSize(newSize)
-                },
-                valueRange = 0f..2f,
-                steps = 1
-            )
-            
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
-                Text(stringResource(R.string.text_size_small), style = MaterialTheme.typography.labelMedium)
-                Text(stringResource(R.string.text_size_medium), style = MaterialTheme.typography.labelMedium)
-                Text(stringResource(R.string.text_size_large), style = MaterialTheme.typography.labelMedium)
+                TextSizePreference.entries.forEach { size ->
+                    val isSelected = uiState.textSize == size
+                    val labelRes = when (size) {
+                        TextSizePreference.SMALL -> R.string.text_size_small
+                        TextSizePreference.MEDIUM -> R.string.text_size_medium
+                        TextSizePreference.LARGE -> R.string.text_size_large
+                    }
+                    TextButton(
+                        onClick = { viewModel.setTextSize(size) },
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            text = stringResource(labelRes),
+                            style = if (isSelected) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge,
+                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
+                    }
+                }
             }
         }
     }
