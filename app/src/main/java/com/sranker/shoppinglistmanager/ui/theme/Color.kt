@@ -16,3 +16,16 @@ val OceanText = Color(0xFFB9F1E8)
 val ForestText = Color(0xFFD2F8D0)
 val SunsetText = Color(0xFFE5DEAE) // Pale yellow from reference
 val SnowText = Color(0xFFFFFFFF)
+
+// New Light Themes
+val SkyPrimary = Color(0xFF7DD3FC) // Light blue
+val SkyBackground = Color(0xFFF8FAFC)
+val SkyText = Color(0xFF0F172A)
+
+val RosePrimary = Color(0xFFFDA4AF) // Pale pink
+val RoseBackground = Color(0xFFFFF1F2)
+val RoseText = Color(0xFF4C0519)
+
+val SandPrimary = Color(0xFFD4D4D8) // Sand/Beige
+val SandBackground = Color(0xFFFAFAFA)
+val SandText = Color(0xFF18181B)

@@ -2,6 +2,7 @@ package com.sranker.shoppinglistmanager.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import com.sranker.shoppinglistmanager.data.repository.AppTheme as ThemeEnum
 import com.sranker.shoppinglistmanager.data.repository.TextSizePreference
@@ -54,6 +55,42 @@ private val SnowLightColorScheme = darkColorScheme(
     surfaceContainer = MinimalistBackground
 )
 
+private val SkyLightColorScheme = lightColorScheme(
+    primary = SkyPrimary,
+    background = SkyBackground,
+    surface = SkyBackground,
+    onPrimary = SkyBackground,
+    onBackground = SkyText,
+    onSurface = SkyText,
+    surfaceVariant = SkyBackground,
+    onSurfaceVariant = SkyText,
+    surfaceContainer = SkyBackground
+)
+
+private val RoseLightColorScheme = lightColorScheme(
+    primary = RosePrimary,
+    background = RoseBackground,
+    surface = RoseBackground,
+    onPrimary = RoseBackground,
+    onBackground = RoseText,
+    onSurface = RoseText,
+    surfaceVariant = RoseBackground,
+    onSurfaceVariant = RoseText,
+    surfaceContainer = RoseBackground
+)
+
+private val SandLightColorScheme = lightColorScheme(
+    primary = SandPrimary,
+    background = SandBackground,
+    surface = SandBackground,
+    onPrimary = SandBackground,
+    onBackground = SandText,
+    onSurface = SandText,
+    surfaceVariant = SandBackground,
+    onSurfaceVariant = SandText,
+    surfaceContainer = SandBackground
+)
+
 @Composable
 fun AppTheme(
     theme: ThemeEnum = ThemeEnum.OCEAN_DARK,
@@ -65,6 +102,9 @@ fun AppTheme(
         ThemeEnum.FOREST_LIGHT -> ForestLightColorScheme
         ThemeEnum.SUNSET_DARK -> SunsetDarkColorScheme
         ThemeEnum.SNOW_LIGHT -> SnowLightColorScheme
+        ThemeEnum.SKY_LIGHT -> SkyLightColorScheme
+        ThemeEnum.ROSE_LIGHT -> RoseLightColorScheme
+        ThemeEnum.SAND_LIGHT -> SandLightColorScheme
     }
 
     val multiplier = when (textSize) {

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class AppTheme { OCEAN_DARK, FOREST_LIGHT, SUNSET_DARK, SNOW_LIGHT }
+enum class AppTheme { OCEAN_DARK, FOREST_LIGHT, SUNSET_DARK, SNOW_LIGHT, SKY_LIGHT, ROSE_LIGHT, SAND_LIGHT }
 enum class Language { ENGLISH, HUNGARIAN, GERMAN }
 enum class TextSizePreference { SMALL, MEDIUM, LARGE }
 

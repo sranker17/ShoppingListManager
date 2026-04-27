@@ -20,7 +20,9 @@
     <string name="theme_forest_light">Forest Light</string>
     <string name="theme_sunset_dark">Sunset Dark</string>
     <string name="theme_snow_light">Snow Light</string>
-
+    <string name="theme_sky_light">Sky Light</string>
+    <string name="theme_rose_light">Rose Light</string>
+    <string name="theme_sand_light">Sand Light</string>
     <string name="language">Language</string>
     <string name="language_english">English</string>
     <string name="language_hungarian">Hungarian</string>

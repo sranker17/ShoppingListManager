@@ -60,11 +60,6 @@ fun ShoppingListScreen(
     )
 
     Column(modifier = Modifier.fillMaxSize()) {
-        CustomHeader(
-            title = stringResource(R.string.app_name),
-            rightIconResId = R.drawable.ic_cart,
-            onRightIconClick = { /* Optional action */ }
-        )
 
         AddItemBar(
             onAddItem = { name, qty -> viewModel.addItem(name, qty) }

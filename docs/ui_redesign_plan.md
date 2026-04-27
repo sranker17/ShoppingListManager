@@ -74,3 +74,15 @@ Here is the breakdown of the changes into fully separable, LLM-digestible tasks.
 **Context:** Ensure empty states match the new minimalist aesthetic.
 **Deliverables:**
 - Update the illustrations or text for empty states (e.g., no items in the list or empty archive) to match the new minimalist theme, removing background cards and integrating seamlessly with the deep background color.
+
+### Task 8: Main Page Cleanup & UTF-8 Support
+**Context:** Clean up the main page and ensure the app supports UTF-8 characters.
+**Deliverables:**
+- Remove the "Shopping List Manager" title and the shopping cart icon from the main page.
+- Ensure the input/output accepts UTF-8 characters (e.g., körte, teniszütő).
+
+### Task 9: Expanded Theme Selection
+**Context:** Add more light themes and improve the theme selector UI to support more options.
+**Deliverables:**
+- Add at least 3 new light color themes using examples from `docs/example/new_colors`.
+- Change the theme selector in the settings screen to a new layout (e.g., Grid or expandable list) that scales better with many themes.
