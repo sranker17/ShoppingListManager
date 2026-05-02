@@ -15,7 +15,8 @@ data class ShoppingListUiState(
     val items: List<ShoppingItem> = emptyList(),
     val isLoading: Boolean = true,
     val undoEvent: ShoppingItem? = null,
-    val suggestions: List<String> = emptyList()
+    val suggestions: List<String> = emptyList(),
+    val duplicateAddEvent: Long? = null
 )
 
 @HiltViewModel
@@ -39,9 +40,13 @@ class ShoppingListViewModel @Inject constructor(
     }
 
     fun addItem(name: String, quantity: Int) {
-        if (name.isBlank()) return
+        val trimmedName = name.trim()
+        if (trimmedName.isBlank()) return
         viewModelScope.launch {
-            repository.addItem(name, quantity)
+            val added = repository.addItem(trimmedName, quantity)
+            if (!added) {
+                _uiState.update { it.copy(duplicateAddEvent = System.currentTimeMillis()) }
+            }
         }
     }
 
@@ -93,6 +98,10 @@ class ShoppingListViewModel @Inject constructor(
         _uiState.update { it.copy(undoEvent = null) }
     }
 
+    fun dismissDuplicateAddEvent() {
+        _uiState.update { it.copy(duplicateAddEvent = null) }
+    }
+
     fun reorderItems(fromIndex: Int, toIndex: Int) {
         val currentItems = _uiState.value.items.toMutableList()
         if (fromIndex !in currentItems.indices || toIndex !in currentItems.indices) return
@@ -131,4 +140,5 @@ class ShoppingListViewModel @Inject constructor(
             }
         }
     }
+
 }

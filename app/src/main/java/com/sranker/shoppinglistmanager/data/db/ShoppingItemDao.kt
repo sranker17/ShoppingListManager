@@ -22,6 +22,12 @@ interface ShoppingItemDao {
     @Query("SELECT * FROM shopping_items WHERE isPurchased = 1")
     suspend fun getPurchasedItems(): List<ShoppingItem>
 
+    @Query("SELECT * FROM shopping_items")
+    suspend fun getAllForDuplicateCheck(): List<ShoppingItem>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM shopping_items WHERE LOWER(TRIM(name)) = LOWER(TRIM(:name)))")
+    suspend fun existsByNameCaseInsensitive(name: String): Boolean
+
     @Query("DELETE FROM shopping_items WHERE isPurchased = 1")
     suspend fun deletePurchasedItems()
 

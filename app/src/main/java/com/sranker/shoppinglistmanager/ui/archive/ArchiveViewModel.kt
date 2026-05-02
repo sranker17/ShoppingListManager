@@ -17,7 +17,8 @@ import javax.inject.Inject
 data class ArchiveUiState(
     val sessions: List<ArchiveSession> = emptyList(),
     val selectedSessionItems: List<ArchivedItem> = emptyList(),
-    val renameDialogSession: ArchiveSession? = null
+    val renameDialogSession: ArchiveSession? = null,
+    val undoEvent: ArchiveSession? = null
 )
 
 @HiltViewModel
@@ -29,6 +30,7 @@ class ArchiveViewModel @Inject constructor(
     val uiState: StateFlow<ArchiveUiState> = _uiState.asStateFlow()
 
     private var itemsJob: Job? = null
+    private var undoBuffer: ArchiveRepository.DeletedArchiveSession? = null
 
     init {
         loadSessions()
@@ -71,5 +73,40 @@ class ArchiveViewModel @Inject constructor(
         viewModelScope.launch {
             repository.reloadSession(sessionId)
         }
+    }
+
+    fun deleteSession(sessionId: Long) {
+        viewModelScope.launch {
+            val deletedSession = repository.deleteSession(sessionId)
+            if (deletedSession != null) {
+                // Check if any items can be restored (not duplicates)
+                val currentItems = repository.getCurrentShoppingItems()
+                val hasRestorableItems = deletedSession.restoredItems.any { archivedItem ->
+                    !currentItems.any { shoppingItem ->
+                        shoppingItem.name.trim().lowercase() == archivedItem.name.trim().lowercase()
+                    }
+                }
+
+                // Only show snackbar if there are items to restore
+                if (hasRestorableItems) {
+                    undoBuffer = deletedSession
+                    _uiState.update { it.copy(undoEvent = deletedSession.session) }
+                }
+            }
+        }
+    }
+
+    fun undoDeleteSession() {
+        viewModelScope.launch {
+            undoBuffer?.let { deletedSession ->
+                repository.restoreSession(deletedSession)
+                dismissUndo()
+            }
+        }
+    }
+
+    fun dismissUndo() {
+        undoBuffer = null
+        _uiState.update { it.copy(undoEvent = null) }
     }
 }

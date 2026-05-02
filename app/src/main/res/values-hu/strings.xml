@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">Bevásárlólista Kezelő</string>
+    <string name="app_name">Mark List</string>
     <string name="add_item">Hozzáadás</string>
     <string name="quantity">Mennyiség</string>
     <string name="undo">Visszavonás</string>
     <string name="item_deleted">Tétel Törölve</string>
+    <string name="duplicate_item_not_added">A tétel már létezik, nem lett hozzáadva</string>
     <string name="archive_session">Munkamenet Archiválása</string>
     <string name="search_filter">Keresés vagy Szűrés</string>
     <string name="no_items_yet">Még nincsenek tételek. Adj hozzá valamit!</string>

@@ -32,7 +32,7 @@ fun AppNavGraph(
         composable(Screen.Archive.route) {
             com.sranker.shoppinglistmanager.ui.archive.ArchiveScreen(onNavigateToDetail = { sessionId ->
                 navController.navigate(Screen.ArchiveDetail.createRoute(sessionId))
-            })
+            }, snackbarHostState = snackbarHostState)
         }
         composable(
             route = Screen.ArchiveDetail.route,

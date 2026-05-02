@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">Einkaufslisten-Manager</string>
+    <string name="app_name">Mark List</string>
     <string name="add_item">Hinzufügen</string>
     <string name="quantity">Menge</string>
     <string name="undo">Rückgängig</string>
     <string name="item_deleted">Element Gelöscht</string>
+    <string name="duplicate_item_not_added">Element existiert bereits, nicht hinzugefügt</string>
     <string name="archive_session">Sitzung Archivieren</string>
     <string name="search_filter">Suchen oder Filtern</string>
     <string name="no_items_yet">Noch keine Elemente. Füge etwas hinzu!</string>
