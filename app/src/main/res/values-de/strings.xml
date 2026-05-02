@@ -20,6 +20,9 @@
     <string name="theme_forest_light">Wald Hell</string>
     <string name="theme_sunset_dark">Sonnenuntergang Dunkel</string>
     <string name="theme_snow_light">Schnee Hell</string>
+    <string name="theme_sky_light">Himmel Hell</string>
+    <string name="theme_rose_light">Rosen Hell</string>
+    <string name="theme_sand_light">Sand Hell</string>
 
     <string name="language">Sprache</string>
     <string name="language_english">Englisch</string>

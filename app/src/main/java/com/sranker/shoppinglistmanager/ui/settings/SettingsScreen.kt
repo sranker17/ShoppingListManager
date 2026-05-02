@@ -23,7 +23,6 @@ import com.sranker.shoppinglistmanager.R
 import com.sranker.shoppinglistmanager.data.repository.AppTheme
 import com.sranker.shoppinglistmanager.data.repository.Language
 import com.sranker.shoppinglistmanager.data.repository.TextSizePreference
-import com.sranker.shoppinglistmanager.util.LocaleHelper
 import com.sranker.shoppinglistmanager.ui.components.CustomHeader
 import com.sranker.shoppinglistmanager.ui.theme.*
 
@@ -116,7 +115,6 @@ fun SettingsScreen(
                     TextButton(
                         onClick = {
                             viewModel.setLanguage(lang)
-                            LocaleHelper.setLocale(lang)
                         },
                         contentPadding = PaddingValues(0.dp)
                     ) {
