@@ -19,6 +19,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sranker.shoppinglistmanager.R
 import kotlinx.coroutines.launch
@@ -26,6 +28,8 @@ import com.sranker.shoppinglistmanager.ui.components.CustomHeader
 import com.sranker.shoppinglistmanager.ui.components.EmptyState
 import com.sranker.shoppinglistmanager.ui.components.LoadingShimmerList
 import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -57,6 +61,11 @@ fun ShoppingListScreen(
         snackbarHostState = snackbarHostState,
         onUndo = { viewModel.undoDelete() },
         onDismiss = { viewModel.dismissUndo() }
+    )
+    DuplicateItemSnackbarHandler(
+        duplicateAddEvent = uiState.duplicateAddEvent,
+        snackbarHostState = snackbarHostState,
+        onDismiss = { viewModel.dismissDuplicateAddEvent() }
     )
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -102,6 +111,13 @@ fun ShoppingListScreen(
 fun AddItemBar(onAddItem: (String, Int) -> Unit) {
     var name by remember { mutableStateOf("") }
     var quantity by remember { mutableIntStateOf(1) }
+    val addCurrentItem = {
+        if (name.isNotBlank()) {
+            onAddItem(name, quantity)
+            name = ""
+            quantity = 1
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -115,6 +131,13 @@ fun AddItemBar(onAddItem: (String, Int) -> Unit) {
             placeholder = { Text(stringResource(R.string.add_item)) },
             modifier = Modifier.weight(1f),
             singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+                capitalization = KeyboardCapitalization.Sentences
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { addCurrentItem() }
+            ),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
                 unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent
@@ -122,13 +145,7 @@ fun AddItemBar(onAddItem: (String, Int) -> Unit) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         OutlinedIconButton(
-            onClick = {
-                if (name.isNotBlank()) {
-                    onAddItem(name, quantity)
-                    name = ""
-                    quantity = 1
-                }
-            },
+            onClick = addCurrentItem,
             enabled = name.isNotBlank(),
             modifier = Modifier.size(48.dp)
         ) {
@@ -169,42 +186,54 @@ fun ShoppingItemRow(
             }
         }
     ) {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .shadow(elevation)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 8.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            draggableHandle?.invoke()
+        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .shadow(elevation)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                draggableHandle?.invoke()
 
-            val scale by animateFloatAsState(
-                targetValue = if (item.isPurchased) 1.2f else 1f,
-                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-                label = "checkboxScale"
-            )
-            
-            Checkbox(
-                checked = item.isPurchased,
-                onCheckedChange = { onToggle() },
-                modifier = Modifier.scale(scale)
-            )
+                val scale by animateFloatAsState(
+                    targetValue = if (item.isPurchased) 1.2f else 1f,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                    label = "checkboxScale"
+                )
 
-            Text(
-                text = item.name,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyLarge,
-                textDecoration = if (item.isPurchased) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
-            )
+                Checkbox(
+                    checked = item.isPurchased,
+                    onCheckedChange = { onToggle() },
+                    modifier = Modifier
+                        .size(20.dp)
+                        .scale(scale)
+                )
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onDecreaseQty) {
-                    Text("-", style = MaterialTheme.typography.titleLarge)
-                }
-                Text("${item.quantity}")
-                IconButton(onClick = onIncreaseQty) {
-                    Text("+", style = MaterialTheme.typography.titleLarge)
+                Text(
+                    text = item.name,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textDecoration = if (item.isPurchased) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = onDecreaseQty,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Text("-", style = MaterialTheme.typography.titleMedium)
+                    }
+                    Text("${item.quantity}")
+                    IconButton(
+                        onClick = onIncreaseQty,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Text("+", style = MaterialTheme.typography.titleMedium)
+                    }
                 }
             }
         }
@@ -230,8 +259,8 @@ fun ShoppingListContent(
     LazyColumn(
         state = lazyListState,
         modifier = modifier,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(items, key = { it.id }) { item ->
             ReorderableItem(reorderableState, key = item.id) { isDragging ->
@@ -245,7 +274,9 @@ fun ShoppingListContent(
                         {
                             IconButton(
                                 onClick = {},
-                                modifier = Modifier.draggableHandle()
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .draggableHandle()
                             ) {
                                 Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.cd_drag_reorder))
                             }
@@ -287,5 +318,22 @@ fun UndoSnackbarHandler(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DuplicateItemSnackbarHandler(
+    duplicateAddEvent: Long?,
+    snackbarHostState: SnackbarHostState,
+    onDismiss: () -> Unit
+) {
+    val duplicateMessage = stringResource(R.string.duplicate_item_not_added)
+    LaunchedEffect(duplicateAddEvent) {
+        duplicateAddEvent ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(
+            message = duplicateMessage,
+            duration = SnackbarDuration.Short
+        )
+        onDismiss()
     }
 }

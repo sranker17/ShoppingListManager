@@ -21,17 +21,20 @@ class ShoppingRepository @Inject constructor(
 
     fun getItems(): Flow<List<ShoppingItem>> = itemDao.getAll()
 
-    suspend fun addItem(name: String, quantity: Int) {
-        db.withTransaction {
+    suspend fun addItem(name: String, quantity: Int): Boolean = db.withTransaction {
+            val trimmedName = name.trim()
+            if (trimmedName.isBlank()) return@withTransaction false
+            if (itemDao.existsByNameCaseInsensitive(trimmedName)) return@withTransaction false
+
             val maxSortOrder = itemDao.getMaxSortOrder() ?: 0
             val newItem = ShoppingItem(
-                name = name,
+                name = trimmedName,
                 quantity = quantity,
                 sortOrder = maxSortOrder + 1
             )
             itemDao.insert(newItem)
-            historyDao.upsert(ItemHistory(name = name))
-        }
+            historyDao.upsert(ItemHistory(name = trimmedName))
+            true
     }
 
     suspend fun toggleItem(id: Long) {

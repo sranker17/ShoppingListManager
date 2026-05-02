@@ -1,6 +1,7 @@
 package com.sranker.shoppinglistmanager.ui.archive
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,13 +31,20 @@ fun ArchiveSmallPreview() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ArchiveScreen(
     onNavigateToDetail: (Long) -> Unit,
+    snackbarHostState: SnackbarHostState,
     viewModel: ArchiveViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    ArchiveUndoSnackbarHandler(
+        undoEvent = uiState.undoEvent,
+        snackbarHostState = snackbarHostState,
+        onUndo = { viewModel.undoDeleteSession() },
+        onDismiss = { viewModel.dismissUndo() }
+    )
 
     Column(modifier = Modifier.fillMaxSize()) {
         CustomHeader(title = stringResource(R.string.nav_archive))
@@ -49,28 +57,66 @@ fun ArchiveScreen(
             )
         } else {
             LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.weight(1f)
             ) {
                 items(uiState.sessions, key = { it.id }) { session ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .combinedClickable(
-                                onClick = { onNavigateToDetail(session.id) },
-                                onLongClick = { viewModel.openRenameDialog(session) }
-                            )
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            val sessionName = session.name
-                            Text(sessionName, style = MaterialTheme.typography.titleMedium)
+                    SwipeToDismissBox(
+                        state = rememberSwipeToDismissBoxState(
+                            confirmValueChange = { value ->
+                                if (value == SwipeToDismissBoxValue.StartToEnd || value == SwipeToDismissBoxValue.EndToStart) {
+                                    viewModel.deleteSession(session.id)
+                                    true
+                                } else {
+                                    false
+                                }
+                            }
+                        ),
+                        backgroundContent = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.errorContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
                         }
-                        IconButton(onClick = { viewModel.openRenameDialog(session) }) {
-                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.rename_session))
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface)
+                                .combinedClickable(
+                                    onClick = { onNavigateToDetail(session.id) },
+                                    onLongClick = { viewModel.openRenameDialog(session) }
+                                )
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                val sessionName = session.name
+                                Text(sessionName, style = MaterialTheme.typography.titleMedium)
+                            }
+                            Spacer(modifier = Modifier.weight(1f))
+                            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                                IconButton(
+                                    onClick = { viewModel.openRenameDialog(session) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = stringResource(R.string.rename_session),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -88,6 +134,31 @@ fun ArchiveScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun ArchiveUndoSnackbarHandler(
+    undoEvent: Any?,
+    snackbarHostState: SnackbarHostState,
+    onUndo: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val deletedMessage = stringResource(R.string.item_deleted)
+    val undoLabel = stringResource(R.string.undo)
+
+    LaunchedEffect(undoEvent) {
+        undoEvent ?: return@LaunchedEffect
+        val result = snackbarHostState.showSnackbar(
+            message = deletedMessage,
+            actionLabel = undoLabel,
+            duration = SnackbarDuration.Short
+        )
+        if (result == SnackbarResult.ActionPerformed) {
+            onUndo()
+        } else {
+            onDismiss()
+        }
     }
 }
 

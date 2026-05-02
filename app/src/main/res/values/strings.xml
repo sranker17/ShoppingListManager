@@ -4,6 +4,7 @@
     <string name="quantity">Quantity</string>
     <string name="undo">Undo</string>
     <string name="item_deleted">Item Deleted</string>
+    <string name="duplicate_item_not_added">Item already exists, not added</string>
     <string name="archive_session">Archive Session</string>
     <string name="search_filter">Search or Filter</string>
     <string name="no_items_yet">No items yet. Add something!</string>
