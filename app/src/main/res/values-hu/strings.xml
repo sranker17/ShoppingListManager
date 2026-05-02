@@ -20,6 +20,9 @@
     <string name="theme_forest_light">Világos Erdő</string>
     <string name="theme_sunset_dark">Sötét Naplemente</string>
     <string name="theme_snow_light">Világos Hó</string>
+    <string name="theme_sky_light">Világos Ég</string>
+    <string name="theme_rose_light">Világos Rózsa</string>
+    <string name="theme_sand_light">Világos Homok</string>
 
     <string name="language">Nyelv</string>
     <string name="language_english">Angol</string>
