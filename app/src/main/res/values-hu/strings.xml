@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bevásárlólista Kezelő</string>
+    <string name="app_name">Mark List</string>
     <string name="add_item">Hozzáadás</string>
     <string name="quantity">Mennyiség</string>
     <string name="undo">Visszavonás</string>

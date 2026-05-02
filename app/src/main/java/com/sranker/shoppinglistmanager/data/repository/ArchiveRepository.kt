@@ -15,7 +15,8 @@ class ArchiveRepository @Inject constructor(
 ) {
     data class DeletedArchiveSession(
         val session: ArchiveSession,
-        val items: List<ArchivedItem>
+        val items: List<ArchivedItem>,
+        val restoredItems: List<ArchivedItem> = items
     )
 
     private val archiveSessionDao = db.archiveSessionDao()
@@ -26,6 +27,8 @@ class ArchiveRepository @Inject constructor(
 
     fun getItems(sessionId: Long): Flow<List<ArchivedItem>> = archivedItemDao.getBySession(sessionId)
 
+    suspend fun getCurrentShoppingItems() = shoppingItemDao.getAllForDuplicateCheck()
+
     suspend fun renameSession(id: Long, name: String) {
         archiveSessionDao.rename(id, name)
     }
@@ -33,17 +36,29 @@ class ArchiveRepository @Inject constructor(
     suspend fun reloadSession(sessionId: Long) {
         db.withTransaction {
             val archivedItems = archivedItemDao.getItemsForSession(sessionId)
-            val maxSortOrder = shoppingItemDao.getMaxSortOrder() ?: 0
+            val currentShoppingItems = shoppingItemDao.getAllForDuplicateCheck()
 
-            archivedItems.forEachIndexed { index, archivedItem ->
-                shoppingItemDao.insert(
-                    ShoppingItem(
-                        name = archivedItem.name,
-                        quantity = archivedItem.quantity,
-                        isPurchased = false,
-                        sortOrder = maxSortOrder + index + 1
+            // Filter out items that already exist in shopping list (case-insensitive)
+            val uniqueItems = archivedItems.filter { archivedItem ->
+                !currentShoppingItems.any { shoppingItem ->
+                    shoppingItem.name.trim().lowercase() == archivedItem.name.trim().lowercase()
+                }
+            }
+
+            // Only add unique items
+            if (uniqueItems.isNotEmpty()) {
+                val maxSortOrder = shoppingItemDao.getMaxSortOrder() ?: 0
+
+                uniqueItems.forEachIndexed { index, archivedItem ->
+                    shoppingItemDao.insert(
+                        ShoppingItem(
+                            name = archivedItem.name,
+                            quantity = archivedItem.quantity,
+                            isPurchased = false,
+                            sortOrder = maxSortOrder + index + 1
+                        )
                     )
-                )
+                }
             }
         }
     }
@@ -52,19 +67,33 @@ class ArchiveRepository @Inject constructor(
         val session = archiveSessionDao.getById(sessionId) ?: return@withTransaction null
         val items = archivedItemDao.getItemsForSession(sessionId)
         archiveSessionDao.delete(session)
-        DeletedArchiveSession(session = session, items = items)
+        DeletedArchiveSession(session = session, items = items, restoredItems = items)
     }
 
     suspend fun restoreSession(deletedSession: DeletedArchiveSession) {
         db.withTransaction {
+            val currentShoppingItems = shoppingItemDao.getAllForDuplicateCheck()
+
+            // Filter out items that already exist in shopping list (case-insensitive)
+            val uniqueItems = deletedSession.restoredItems.filter { archivedItem ->
+                !currentShoppingItems.any { shoppingItem ->
+                    shoppingItem.name.trim().lowercase() == archivedItem.name.trim().lowercase()
+                }
+            }
+
+            // Only restore if there are unique items
+            if (uniqueItems.isEmpty()) {
+                return@withTransaction
+            }
+
             val restoredSessionId = archiveSessionDao.insert(deletedSession.session.copy(id = 0))
-            val restoredItems = deletedSession.items.map { archivedItem ->
+            val restoredArchiveItems = uniqueItems.map { archivedItem ->
                 archivedItem.copy(
                     id = 0,
                     sessionId = restoredSessionId
                 )
             }
-            archivedItemDao.insertAll(restoredItems)
+            archivedItemDao.insertAll(restoredArchiveItems)
         }
     }
 }

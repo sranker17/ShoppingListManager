@@ -79,8 +79,19 @@ class ArchiveViewModel @Inject constructor(
         viewModelScope.launch {
             val deletedSession = repository.deleteSession(sessionId)
             if (deletedSession != null) {
-                undoBuffer = deletedSession
-                _uiState.update { it.copy(undoEvent = deletedSession.session) }
+                // Check if any items can be restored (not duplicates)
+                val currentItems = repository.getCurrentShoppingItems()
+                val hasRestorableItems = deletedSession.restoredItems.any { archivedItem ->
+                    !currentItems.any { shoppingItem ->
+                        shoppingItem.name.trim().lowercase() == archivedItem.name.trim().lowercase()
+                    }
+                }
+
+                // Only show snackbar if there are items to restore
+                if (hasRestorableItems) {
+                    undoBuffer = deletedSession
+                    _uiState.update { it.copy(undoEvent = deletedSession.session) }
+                }
             }
         }
     }
