@@ -13,10 +13,10 @@ android {
 
     defaultConfig {
         applicationId = "com.sranker.shoppinglistmanager"
-        minSdk = 26
+        minSdk = 33
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -35,9 +35,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+//     kotlinOptions {
+//         jvmTarget = "17"
+//     }
     buildFeatures {
         compose = true
     }
@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation(libs.androidx.appcompat)
 

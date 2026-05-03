@@ -269,7 +269,7 @@ fun ShoppingListContent(
                 ShoppingItemRow(
                     item = item,
                     elevation = elevation,
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     draggableHandle = if (!item.isPurchased) {
                         {
                             IconButton(
