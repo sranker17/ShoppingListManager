@@ -5,7 +5,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,7 +32,7 @@ fun AppScaffold() {
             val items = listOf(
                 Triple(Screen.ShoppingList.route, R.string.nav_list, Icons.AutoMirrored.Filled.List),
                 Triple(Screen.Archive.route, R.string.nav_archive, Icons.Default.ShoppingCart),
-                Triple(Screen.Settings.route, R.string.nav_settings, Icons.Default.Settings)
+                Triple(Screen.Settings.route, R.string.nav_settings, Icons.Default.Settings),
             )
 
             NavigationBar(
