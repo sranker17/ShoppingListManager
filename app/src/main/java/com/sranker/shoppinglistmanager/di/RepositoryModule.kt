@@ -7,10 +7,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.sranker.shoppinglistmanager.data.db.ShopListDatabase
+import com.sranker.shoppinglistmanager.data.db.ShoppingItemDao
 import com.sranker.shoppinglistmanager.data.repository.ArchiveRepository
 import com.sranker.shoppinglistmanager.data.repository.SettingsRepository
 import com.sranker.shoppinglistmanager.data.repository.ShoppingRepository
 import com.sranker.shoppinglistmanager.data.repository.SuggestionRepository
+import com.sranker.shoppinglistmanager.widget.WidgetUpdater
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,8 +44,12 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideShoppingRepository(db: ShopListDatabase): ShoppingRepository {
-        return ShoppingRepository(db)
+    fun provideShoppingItemDao(db: ShopListDatabase): ShoppingItemDao = db.shoppingItemDao()
+
+    @Provides
+    @Singleton
+    fun provideShoppingRepository(db: ShopListDatabase, widgetUpdater: WidgetUpdater): ShoppingRepository {
+        return ShoppingRepository(db, widgetUpdater)
     }
 
     @Provides
