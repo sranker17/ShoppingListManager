@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Circle outline used by the home screen widget status indicator.
+    Stroke width is intentionally bold (6dp) for clear visibility at 1x1 widget size.
+    The fill is transparent so the dark widget background shows through the center.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@android:color/transparent" />
+    <stroke
+        android:width="6dp"
+        android:color="#FFFFFFFF" />
+</shape>
