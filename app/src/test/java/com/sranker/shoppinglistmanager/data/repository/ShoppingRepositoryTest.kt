@@ -1,6 +1,7 @@
 package com.sranker.shoppinglistmanager.data.repository
 
 import com.sranker.shoppinglistmanager.data.db.*
+import com.sranker.shoppinglistmanager.widget.WidgetUpdater
 import androidx.room.withTransaction
 import io.mockk.*
 import kotlinx.coroutines.flow.flowOf
@@ -17,6 +18,7 @@ class ShoppingRepositoryTest {
     private lateinit var historyDao: ItemHistoryDao
     private lateinit var archiveSessionDao: ArchiveSessionDao
     private lateinit var archivedItemDao: ArchivedItemDao
+    private lateinit var widgetUpdater: WidgetUpdater
     private lateinit var repository: ShoppingRepository
 
     @BeforeEach
@@ -38,7 +40,9 @@ class ShoppingRepositoryTest {
             transactionSlot.captured.invoke()
         }
 
-        repository = ShoppingRepository(db)
+        widgetUpdater = mockk(relaxed = true)
+
+        repository = ShoppingRepository(db, widgetUpdater)
     }
 
     @Test

@@ -74,7 +74,7 @@ class ShoppingRepository @Inject constructor(
 
     suspend fun reorderItems(items: List<ShoppingItem>) {
         itemDao.updateAll(items)
-        // Reordering does not change checked state — no widget update needed.
+        widgetUpdater.update()
     }
 
     suspend fun archiveSession() {

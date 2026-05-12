@@ -21,6 +21,8 @@ import androidx.glance.layout.padding
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.unit.ColorProvider
+import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.sranker.shoppinglistmanager.MainActivity
 import com.sranker.shoppinglistmanager.R
 import com.sranker.shoppinglistmanager.ui.theme.WidgetAlertRed
@@ -44,10 +46,8 @@ class StatusWidget : GlanceAppWidget() {
         provideContent {
             // Read persisted status from Glance Preferences (default = AllDone / green)
             val prefs = currentState<androidx.datastore.preferences.core.Preferences>()
-            val statusName = prefs[androidx.datastore.preferences.core.stringPreferencesKey(
-                PREF_KEY_WIDGET_STATUS
-            )] ?: WidgetStatus.AllDone.name
-            val status = WidgetStatus.valueOf(statusName)
+            val statusName = prefs[stringPreferencesKey(PREF_KEY_WIDGET_STATUS)] ?: WidgetStatus.AllDone.name
+            val status = try { WidgetStatus.valueOf(statusName) } catch (e: Exception) { WidgetStatus.AllDone }
 
             val circleColor = when (status) {
                 WidgetStatus.AllDone   -> ColorProvider(WidgetGreen)
@@ -59,7 +59,7 @@ class StatusWidget : GlanceAppWidget() {
                 modifier = GlanceModifier
                     .fillMaxSize()
                     .background(ColorProvider(androidx.compose.ui.graphics.Color(0xFF151515)))
-                    .cornerRadius(16)
+                    .cornerRadius(16.dp)
                     .clickable(actionStartActivity<MainActivity>()),
                 contentAlignment = Alignment.Center
             ) {
@@ -70,7 +70,7 @@ class StatusWidget : GlanceAppWidget() {
                     contentDescription = null,
                     modifier = GlanceModifier
                         .fillMaxSize()
-                        .padding(10),
+                        .padding(10.dp),
                     colorFilter = androidx.glance.ColorFilter.tint(circleColor)
                 )
             }
