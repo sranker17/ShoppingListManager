@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Widget metadata for StatusWidget.
+
+    targetCellWidth/Height = 1 → icon-sized 1x1 grid cell.
+    updatePeriodMillis = 0    → no periodic OS-triggered updates; all updates
+                                are push-based via WidgetUpdater.
+    previewLayout             → faithful preview in the launcher widget picker
+                                (preferred over previewImage on API 31+, which
+                                is our minSdk 33 baseline).
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="57dp"
+    android:minHeight="57dp"
+    android:targetCellWidth="1"
+    android:targetCellHeight="1"
+    android:updatePeriodMillis="0"
+    android:resizeMode="none"
+    android:widgetCategory="home_screen"
+    android:previewLayout="@layout/widget_preview" />

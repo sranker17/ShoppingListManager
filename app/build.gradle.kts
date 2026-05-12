@@ -82,6 +82,10 @@ dependencies {
     // Navigation
     implementation(libs.navigation.compose)
 
+    // Glance
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
     // Reorderable
     implementation(libs.calvin.reorderable)
 

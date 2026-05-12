@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Static preview shown in the launcher's widget picker.
+    Mirrors the real widget: dark background + green circle outline.
+    Uses the same circle drawable and padding as the live Glance layout
+    so the picker thumbnail is faithful to the actual widget appearance.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#FF151515">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:src="@drawable/ic_widget_circle_outline"
+        app:tint="#FF86EFAC"
+        android:contentDescription="@null" />
+
+</FrameLayout>

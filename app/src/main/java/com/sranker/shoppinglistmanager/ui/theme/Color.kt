@@ -29,3 +29,7 @@ val RoseText = Color(0xFF4C0519)
 val SandPrimary = Color(0xFFD4D4D8) // Sand/Beige
 val SandBackground = Color(0xFFFAFAFA)
 val SandText = Color(0xFF18181B)
+
+// Widget Status Colors
+val WidgetGreen = Color(0xFF86EFAC)   // Light green: list is empty or fully checked
+val WidgetAlertRed = Color(0xFFF87171) // Soft red: unchecked items remain
